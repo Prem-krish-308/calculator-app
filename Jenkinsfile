@@ -32,13 +32,46 @@ pipeline {
             steps {
                 echo "Running SonarQube analysis..."
                 script {
-                def scannerHome = tool 'sonarqube'
+                    def scannerHome = tool 'sonarqube'
 
-                withSonarQubeEnv('sonarqube') {
-                    sh """
-                        ${scannerHome}/bin/sonar-scanner
-                    """
+                    withSonarQubeEnv('sonarqube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner
+                        """
                     }
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+
+                sh """
+                    docker build \
+                    -t premkrish308/calculator-app:latest \
+                    -t premkrish308/calculator-app:${BUILD_NUMBER} .
+                """
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                echo 'Logging into Docker Hub...'
+
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+                        docker push premkrish308/calculator-app:latest
+
+                        docker push premkrish308/calculator-app:${BUILD_NUMBER}
+
+                        docker logout
+                    '''
                 }
             }
         }
