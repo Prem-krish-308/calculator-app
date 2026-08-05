@@ -88,4 +88,7 @@ Configure it on Jenkins
 curl -fL https://install-cli.jfrog.io | sh
 sudo mv jf /usr/local/bin/
 jf --version
+
 ```
+## Plugins in Jenkins
+<img width="666" height="768" alt="image" src="https://github.com/user-attachments/assets/546db37e-c12b-46a9-9964-850f5f0dad31" />
