@@ -60,31 +60,30 @@ sudo apt install git -y
 sudo apt install python3 python3-pip python3-venv -y
 # Install docker
 sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
 sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
 echo \
 "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
 https://download.docker.com/linux/ubuntu \
 $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
 sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
 sudo systemctl enable docker
 sudo systemctl start docker
+
 # Allow Jenkins to use Docker
 sudo usermod -aG docker jenkins
 sudo systemctl restart jenkins
 groups jenkins
-# Install Sonar-Scanner
-cd /opt
 
-sudo wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-7.2.0.5079-linux-x64.zip
-sudo apt install unzip -y
-sudo unzip sonar-scanner-7.2.0.5079-linux-x64.zip
-sudo mv sonar-scanner-* sonar-scanner
-echo 'export PATH=$PATH:/opt/sonar-scanner/bin' | sudo tee -a /etc/profile
-source /etc/profile
-sonar-scanner --version
+# Install Sonar-Scanner
+Configure it on Jenkins
+
 # Install Jfrog CLI
 curl -fL https://install-cli.jfrog.io | sh
 sudo mv jf /usr/local/bin/
