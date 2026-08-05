@@ -32,7 +32,7 @@ http://127.0.0.1:5000
 pytest
 ```
 
-Install Java and Jenkins on Ubuntu machine
+## Install Java and Jenkins on Ubuntu machine
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
