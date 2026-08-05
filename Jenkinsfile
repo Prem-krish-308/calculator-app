@@ -28,5 +28,19 @@ pipeline {
                 sh './venv/bin/python -m pytest'
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                echo "Running SonarQube analysis..."
+                script {
+                def scannerHome = tool 'sonarqube'
+
+                withSonarQubeEnv('sonarqube') {
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner
+                    """
+                    }
+                }
+            }
+        }
     }
 }
