@@ -20,5 +20,11 @@ pipeline {
                 sh './venv/bin/pip install -r requirements.txt'
             }
         }
+        stage('Run Tests') {
+            steps {
+                echo "Running tests..."
+                sh 'pytest'
+            }
+        }
     }
 }
