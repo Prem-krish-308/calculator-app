@@ -92,3 +92,24 @@ jf --version
 ```
 ## Plugins in Jenkins
 <img width="666" height="768" alt="image" src="https://github.com/user-attachments/assets/546db37e-c12b-46a9-9964-850f5f0dad31" />
+
+## Install Sonarqube on another ubuntu instance
+```bash
+# Follow the below steps 
+https://share.gemini.google/6oggh996zJS3
+```
+
+## Install trivy
+```bash
+sudo apt-get update
+sudo apt-get install -y wget gnupg apt-transport-https
+
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+
+sudo apt-get update
+sudo apt-get install -y trivy
+
+trivy --version
+```
