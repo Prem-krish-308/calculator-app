@@ -2,9 +2,9 @@ pipeline {
 
     agent any
 
-    environment {
+   /*environment {
         // Environment variables
-    }
+    }*/
 
     stages {
 
