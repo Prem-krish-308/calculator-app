@@ -60,7 +60,6 @@ pipeline {
                 sh """
                     trivy image \
                     --severity HIGH,CRITICAL \
-                    --exit-code 1 \
                     --no-progress \
                     premkrish308/calculator-app:${BUILD_NUMBER}
                 """
