@@ -53,6 +53,19 @@ pipeline {
                 """
             }
         }
+        stage('Trivy Image Scan') {
+            steps {
+                echo 'Scanning Docker image with Trivy...'
+
+                sh """
+                    trivy image \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    --no-progress \
+                    premkrish308/calculator-app:${BUILD_NUMBER}
+                """
+            }
+        }
         stage('Push Docker Image') {
             steps {
                 echo 'Logging into Docker Hub...'
