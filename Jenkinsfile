@@ -18,12 +18,14 @@ pipeline {
                 sh './venv/bin/python -m pip install --upgrade pip'
                 echo "Installing dependencies from requirements.txt..."
                 sh './venv/bin/pip install -r requirements.txt'
+                echo "pip list output:"
+                sh './venv/bin/pip list'
             }
         }
         stage('Run Tests') {
             steps {
                 echo "Running tests..."
-                sh 'pytest'
+                sh './venv/bin/python -m pytest'
             }
         }
     }
