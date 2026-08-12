@@ -117,12 +117,12 @@ pipeline {
 
                 withCredentials([
                     gitUsernamePassword(
-                        credentialsId: 'Prem-krish-308',
+                        credentialsId: 'github-pat-cred',
                         gitToolName: 'Default'
                     )
                 ]) {
                     sh '''
-                        git push origin main
+                        git push origin HEAD:main
                     '''
                 }
             }
