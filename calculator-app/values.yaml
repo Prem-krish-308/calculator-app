@@ -1,0 +1,16 @@
+replicaCount: 2
+
+image:
+  repository: premkrish308/calculator-app
+  pullPolicy: IfNotPresent
+  tag: "17"
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: calculator.local
