@@ -91,12 +91,12 @@ pipeline {
             steps {
                 echo "Updating Helm image tag to ${BUILD_NUMBER}..."
 
-                sh """
-                    sed -i 's/^  tag: .*/  tag: "${BUILD_NUMBER}"/' calculator-app/values.yaml
-                """
+                sh '''
+                    sed -i 's/^  tag: .*/  tag: "'${BUILD_NUMBER}'"/' calculator-app/values.yaml
 
-                echo "Updated values.yaml:"
-                cat calculator-app/values.yaml
+                    echo "Updated values.yaml:"
+                    cat calculator-app/values.yaml
+                '''
             }
         }
 
