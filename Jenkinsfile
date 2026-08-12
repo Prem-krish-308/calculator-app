@@ -87,5 +87,45 @@ pipeline {
                 }
             }
         }
+        stage('Update Helm Image Tag') {
+            steps {
+                echo "Updating Helm image tag to ${BUILD_NUMBER}..."
+
+                sh """
+                    sed -i 's/^  tag: .*/  tag: "${BUILD_NUMBER}"/' calculator-app/values.yaml
+                """
+
+                echo "Updated values.yaml:"
+                cat calculator-app/values.yaml
+            }
+        }
+
+        stage('Commit and Push GitOps Changes') {
+            steps {
+                echo "Committing Helm image tag update..."
+
+                sh '''
+                    git config user.name "Jenkins"
+                    git config user.email "jenkins@localhost"
+
+                    git add calculator-app/values.yaml
+
+                    git commit \
+                        -m "Update calculator image to ${BUILD_NUMBER}" \
+                        || echo "No changes to commit"
+                '''
+
+                withCredentials([
+                    gitUsernamePassword(
+                        credentialsId: 'Prem-krish-308',
+                        gitToolName: 'Default'
+                    )
+                ]) {
+                    sh '''
+                        git push origin main
+                    '''
+                }
+            }
+        }
     }
 }
