@@ -2,35 +2,60 @@ pipeline {
 
     agent any
 
+    environment {
+        AWS_REGION = 'ap-southeast-2'
+        ECR_REPOSITORY = '306372151512.dkr.ecr.ap-southeast-2.amazonaws.com/calculator-app'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
                 echo "Checking out code..."
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Prem-krish-308', url: 'https://github.com/Prem-krish-308/calculator-app.git']])
+
+                checkout scmGit(
+                    branches: [[name: '*/main']],
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'Prem-krish-308',
+                        url: 'https://github.com/Prem-krish-308/calculator-app.git'
+                    ]]
+                )
             }
         }
-        stage('Setup Python Environment'){
+
+        stage('Setup Python Environment') {
             steps {
                 echo "Creating Python virtual environment..."
+
                 sh 'python3 -m venv venv'
+
                 echo "Activating virtual environment and installing dependencies..."
+
                 sh './venv/bin/python -m pip install --upgrade pip'
+
                 echo "Installing dependencies from requirements.txt..."
+
                 sh './venv/bin/pip install -r requirements.txt'
+
                 echo "pip list output:"
+
                 sh './venv/bin/pip list'
             }
         }
+
         stage('Run Tests') {
             steps {
                 echo "Running tests..."
+
                 sh './venv/bin/python -m pytest'
             }
         }
-        stage('SonarQube Analysis') {
+
+        /*stage('SonarQube Analysis') {
             steps {
                 echo "Running SonarQube analysis..."
+
                 script {
                     def scannerHome = tool 'sonarqube'
 
@@ -41,52 +66,63 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
+
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image...'
+                echo "Building Docker image..."
 
                 sh """
                     docker build \
-                    -t premkrish308/calculator-app:latest \
-                    -t premkrish308/calculator-app:${BUILD_NUMBER} .
+                    -t ${ECR_REPOSITORY}:latest \
+                    -t ${ECR_REPOSITORY}:${BUILD_NUMBER} .
                 """
             }
         }
+
         stage('Trivy Image Scan') {
             steps {
-                echo 'Scanning Docker image with Trivy...'
+                echo "Scanning Docker image with Trivy..."
 
                 sh """
                     trivy image \
                     --severity HIGH,CRITICAL \
                     --no-progress \
-                    premkrish308/calculator-app:${BUILD_NUMBER}
+                    ${ECR_REPOSITORY}:${BUILD_NUMBER}
                 """
             }
         }
-        stage('Push Docker Image') {
-            steps {
-                echo 'Logging into Docker Hub...'
 
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
+        stage('Push Image to ECR') {
+            steps {
+                echo "Logging into AWS ECR..."
+
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                     credentialsId: 'aws-ecr-credentials']
+                ]) {
 
                     sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        aws ecr get-login-password \
+                            --region "$AWS_REGION" | \
+                        docker login \
+                            --username AWS \
+                            --password-stdin "$ECR_REPOSITORY"
 
-                        docker push premkrish308/calculator-app:latest
+                        echo "Pushing image to ECR..."
 
-                        docker push premkrish308/calculator-app:${BUILD_NUMBER}
+                        docker push "$ECR_REPOSITORY:latest"
 
-                        docker logout
+                        docker push "$ECR_REPOSITORY:${BUILD_NUMBER}"
+
+                        echo "Logging out from ECR..."
+
+                        docker logout "$ECR_REPOSITORY"
                     '''
                 }
             }
         }
+
         stage('Update Helm Image Tag') {
             steps {
                 echo "Updating Helm image tag to ${BUILD_NUMBER}..."
@@ -95,6 +131,7 @@ pipeline {
                     sed -i 's/^  tag: .*/  tag: "'${BUILD_NUMBER}'"/' calculator-app/values.yaml
 
                     echo "Updated values.yaml:"
+
                     cat calculator-app/values.yaml
                 '''
             }

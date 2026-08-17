@@ -1,9 +1,9 @@
 replicaCount: 2
 
 image:
-  repository: premkrish308/calculator-app
+  repository: 306372151512.dkr.ecr.ap-southeast-2.amazonaws.com/calculator-app
   pullPolicy: IfNotPresent
-  tag: "22"
+  tag: "..."
 
 service:
   type: ClusterIP
