@@ -11,6 +11,11 @@ calculator = Calculator()
 def home():
     return render_template("index.html")
 
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "UP"
+    }), 200
 
 @app.route("/calculate", methods=["POST"])
 def calculate():

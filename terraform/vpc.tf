@@ -71,24 +71,21 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_eip" "nat" {
-  count = length(var.private_subnet_cidrs)
-
   domain = "vpc"
 
   tags = {
-    Name        = "${var.environment}-nat-eip-${count.index + 1}"
+    Name        = "${var.environment}-nat-eip"
     Environment = var.environment
   }
 }
 
 resource "aws_nat_gateway" "main" {
-  count         = length(var.public_subnet_cidrs)
-  allocation_id = aws_eip.nat[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
   depends_on    = [aws_internet_gateway.main]
 
   tags = {
-    Name        = "${var.environment}-nat-gateway-${count.index + 1}"
+    Name        = "${var.environment}-nat-gateway"
     Environment = var.environment
   }
 }
@@ -98,7 +95,7 @@ resource "aws_route_table" "private" {
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main[0].id
+    nat_gateway_id = aws_nat_gateway.main.id
   }
   tags = {
     Name        = "${var.environment}-private-route-table"
