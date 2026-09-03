@@ -1,0 +1,6 @@
+replicaCount: 2
+
+environment: uat
+
+ingress:
+  host: calculator-uat.local

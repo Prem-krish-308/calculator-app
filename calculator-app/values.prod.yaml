@@ -1,0 +1,14 @@
+replicaCount: 3
+
+envrionment: prod
+
+ingress:
+  host: calculator.example.com
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi

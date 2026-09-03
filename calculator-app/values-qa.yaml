@@ -1,0 +1,6 @@
+replicaCount: 2
+
+environment: qa
+
+ingress:
+  host: calculator-qa.local

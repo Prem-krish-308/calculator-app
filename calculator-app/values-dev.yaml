@@ -1,0 +1,6 @@
+replicaCount: 1
+
+environment: dev
+
+ingress:
+  host: calculator-dev.local

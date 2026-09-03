@@ -24,6 +24,22 @@ resource "aws_eks_cluster" "main" {
   ]
 }
 
+resource "aws_eks_access_entry" "batty" {
+  cluster_name  = aws_eks_cluster.main.name
+  principal_arn = "arn:aws:iam::306372151512:user/Batty"
+}
+
+resource "aws_eks_access_policy_association" "batty_admin" {
+  cluster_name  = aws_eks_cluster.main.name
+  principal_arn = aws_eks_access_entry.batty.principal_arn
+
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+}
+
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.cluster_name}-nodes"
